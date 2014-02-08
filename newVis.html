@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
+    <!--<script src="//connect.facebook.net/en_US/all.js"></script>-->
+    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="assets/js/vis.js"></script>
+    <script src="http://www.promisejs.org/implementations/promise/promise-3.2.0.js"></script>
+    <style type="text/css" src="assets/styles/visstyle.css"></style>
+</head>
+<body onload="loadPage();">
+    <div id="navi">
+        <button name="button" onclick="toggleMode('alpha');">Alpha</button>
+        <button name="button" onclick="toggleMode('location');">Location</button>
+        <button name="button" onclick="toggleMode('network');">Network</button>
+        <button name="button" onclick="toggleMode('company');">Company</button>
+    </div>
+    <svg id="chart"></svg>
+</body>
+</html>

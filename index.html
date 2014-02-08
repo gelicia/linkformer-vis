@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- META DATA -->
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="MSSmartTagsPreventParsing" content="true" />
+        <meta http-equiv="imagetoolbar" content="no" />
+        <!--[if IE]><meta http-equiv="cleartype" content="on" /><![endif]-->
+
+        <!-- SEO -->
+        <title>Linkformer</title>
+
+        <!-- ICONS -->
+        <link rel="shortcut icon" type="image/ico" href="assets/images/favicon.ico" />
+
+        <!-- STYLESHEETS -->
+        <link rel="stylesheet" media="screen, projection" href="assets/styles/screen.css" />
+        <link rel="stylesheet" media="screen, projection" href="assets/styles/bootstrap.css" />
+
+        <!-- JAVASCRIPT -->
+        <script type="text/javascript" src="assets/js/src/config.js"></script>
+        <script type="text/javascript" data-main="assets/js/main" src="assets/js/vendor/require.js"></script>
+    </head>
+<body>
+    <div class="container">
+        <h1>Linkformer</h1>
+        <div class="row login-buttons">
+            <div class="btn btn-primary js-fb-login">Login to Facebook</div>
+            <div class="btn btn-info js-li-login">Login to LinkedIn</div>
+        </div>
+        <div class="row">
+            <form id="search">
+                <select>
+                    <option value="keywords">Keyword</option>
+                    <option value="company-name">Company</option>
+                    <option value="school-name">School</option>
+                </select>
+                <input type="text" class="form-search"/>
+                <input type="submit" class="search-query" value="Search"/>
+            </form>
+        </div>
+        <div class="row">
+            <div class="facebook-results span6"></div>
+            <div class="linkedin-results span6"></div>
+        </div>
+    </div>
+</body>
+</html>

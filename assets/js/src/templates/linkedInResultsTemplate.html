@@ -1,0 +1,33 @@
+<h3>LinkedIn Results (People search API)</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Company</th>
+            <!--<th>School</th>-->
+            <th>Location</th>
+            <th>Distance</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% _.each(result, function (row) { %>
+            <%
+            if (row.firstName !== 'private') {
+                var firstName = (row.hasOwnProperty('firstName')) ? row.firstName : '';
+                var lastName = (row.hasOwnProperty('lastName')) ? row.lastName : '';
+                var position = (row.hasOwnProperty('positions') && row.positions.hasOwnProperty('values') && row.positions.values.length > 0)? row.positions.values[0].company.name : '';
+                var locationName = (row.hasOwnProperty('location')) ? row.location.name : '';
+                %>
+                <tr>
+                    <td><%= firstName %></td>
+                    <td><%= lastName %></td>
+                    <td><%= position %></td>
+                    <!--<td></td>-->
+                    <td><%= locationName %></td>
+                    <td><%= row.distance %></td>
+                </tr>
+            <% } %>
+        <% }); %>
+    </tbody>
+</table>

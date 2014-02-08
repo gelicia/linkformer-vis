@@ -1,0 +1,227 @@
+{
+   "data": [
+      {
+         "uid": 45800398,
+         "name": "Bob George",
+         "first_name": "Bob",
+         "last_name": "George",
+         "work": [
+            {
+               "employer": {
+                  "id": 001,
+                  "name": "Acme Industrial"
+               },
+               "location": {
+                  "id": 33,
+                  "name": "Winona, Minnesota"
+               },
+               "position": {
+                  "id": 005,
+                  "name": "Software Developer"
+               },
+               "description": "I rite kode.",
+               "start_date": "2006-14-02",
+               "end_date": "0000-00"
+            }
+         ],
+         "education": [
+            {
+               "school": {
+                  "id": 23,
+                  "name": "Something"
+               },
+               "year": {
+                  "id": 46,
+                  "name": "2003"
+               },
+               "type": "High School"
+            },
+            {
+               "school": {
+                  "id": 28,
+                  "name": "Generic State University"
+               },
+               "year": {
+                  "id": 79,
+                  "name": "2007"
+               },
+               "concentration": [
+                  {
+                     "id": 639,
+                     "name": "Games"
+                  },
+                  {
+                     "id": 44,
+                     "name": "Poli Sci"
+                  }
+               ],
+               "type": "College"
+            }
+         ],
+         "current_location": {
+            "city": "Generic",
+            "state": "Minnesota",
+            "country": "United States",
+            "zip": "",
+            "latitude": 12,
+            "longitude": -12,
+            "id": 33,
+            "name": "Generic, Minnesota"
+         }
+      },
+      {
+         "uid": 80,
+         "name": "Diane Zeeby",
+         "first_name": "Diane",
+         "last_name": "Zeeby",
+         "work": [
+            
+         ],
+         "education": [
+            
+         ],
+         "current_location": {
+            "city": "Generic",
+            "state": "Minnesota",
+            "country": "United States",
+            "zip": "",
+            "latitude": 12,
+            "longitude": -12,
+            "id": 33,
+            "name": "Generic, Minnesota"
+         }
+      },
+      {
+         "uid": 14,
+         "name": "Jim Bob",
+         "first_name": "Jim",
+         "last_name": "Bob",
+         "work": [
+            {
+               "employer": {
+                  "id": 34334,
+                  "name": "WarCraft"
+               },
+               "position": {
+                  "id": 22323,
+                  "name": "Nerds"
+               },
+               "description": "Something Codery",
+               "start_date": "2007-11-11",
+               "end_date": "0000-00"
+            }
+         ],
+         "education": [
+            {
+               "school": {
+                  "id": 23232,
+                  "name": "Somewhere HS"
+               },
+               "type": "High School"
+            },
+            {
+               "school": {
+                  "id": 28,
+                  "name": "Generic State University"
+               },
+               "year": {
+                  "id": 2323,
+                  "name": "2008"
+               },
+               "concentration": [
+                  {
+                     "id": 231,
+                     "name": "Nerd Lite"
+                  },
+                  {
+                     "id": 845,
+                     "name": "Party USA"
+                  },
+                  {
+                     "id": 465,
+                     "name": "Chemistry"
+                  }
+               ],
+               "type": "College"
+            }
+         ],
+         "current_location": {
+            "city": "Generic",
+            "state": "Minnesota",
+            "country": "United States",
+            "zip": "",
+            "latitude": 12,
+            "longitude": -12,
+            "id": 33,
+            "name": "Generic, Minnesota"
+         }
+      },
+      {
+         "uid": 343463,
+         "name": "Ken Ned",
+         "first_name": "Ken",
+         "last_name": "Ned",
+         "work": [
+            {
+               "employer": {
+                  "id": 001,
+                  "name": "Acme Industrial"
+               },
+               "location": {
+                  "id": 33,
+                  "name": "Winona, Minnesota"
+               },
+               "position": {
+                  "id": 34343435,
+                  "name": "Doing things"
+               },
+               "description": "And stuff",
+               "start_date": "2010-10-02"
+            },
+            {
+               "employer": {
+                  "id": 345345,
+                  "name": "Ninja"
+               },
+               "position": {
+                  "id": 34535345345,
+                  "name": "Starrin"
+               },
+               "description": "Something you know too much",
+               "start_date": "2003-30-10",
+               "end_date": "2009-22-01"
+            }
+         ],
+         "education": [
+            {
+               "school": {
+                  "id": 34343434345,
+                  "name": "Hollywood HS"
+               },
+               "type": "High School"
+            },
+            {
+               "school": {
+                  "id": 28,
+                  "name": "Generic State University"
+               },
+               "year": {
+                  "id": 65767,
+                  "name": "2012"
+               },
+               "type": "College"
+            }
+         ],
+         "current_location": {
+            "city": "Generic",
+            "state": "Minnesota",
+            "country": "United States",
+            "zip": "",
+            "latitude": 12,
+            "longitude": -12,
+            "id": 33,
+            "name": "Generic, Minnesota"
+         }
+      }
+   ]
+}

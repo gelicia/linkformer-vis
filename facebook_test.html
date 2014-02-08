@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>-->
+    <!--<script src="//connect.facebook.net/en_US/all.js"></script>-->
+    <script type="text/javascript" src="http://mbostock.github.com/d3/d3.js"></script>
+</head>
+<body>
+<div id="fb-root"></div>
+<script>
+    window.fbAsyncInit = function () {
+        // init the FB JS SDK
+        FB.init({
+            appId:     '578264465522377', // App ID from the App Dashboard
+            channelUrl:'//athens.sierrabravo.net/~nbrunett/linkformer.prototype/channel.html', // Channel File for x-domain communication
+            status:    true, // check the login status upon init?
+            cookie:    true, // set sessions cookies to allow your server to access the session?
+            xfbml:     true  // parse XFBML tags on this page?
+        });
+    };
+
+    // Load the SDK's source Asynchronously
+    // Note that the debug version is being actively developed and might
+    // contain some type checks that are overly strict.
+    // Please report such bugs using the bugs tool.
+    (function (d, debug) {
+        var js, id = 'facebook-jssdk', ref = d.getElementsByTagName('script')[0];
+        if (d.getElementById(id)) {
+            return;
+        }
+        js = d.createElement('script');
+        js.id = id;
+        js.async = true;
+        js.src = "//connect.facebook.net/en_US/all" + (debug ? "/debug" : "") + ".js";
+        ref.parentNode.insertBefore(js, ref);
+    }(document, /*debug*/ false));
+</script>
+<script type="text/javascript" src="//platform.linkedin.com/in.js">
+    api_key: tlideznaswj2
+    authorize: true
+    scope: r_fullprofile,r_network
+</script>
+<script type="text/javascript">
+    window.onload = function () {
+        FacebookApi = {
+            friendsResponse: {},
+            getLoginStatus: function () {
+                FB.getLoginStatus(this.getLoginStatusCallback);
+            },
+            getLoginStatusCallback: function (response) {
+                if (response.status === 'connected') {
+                    // connected
+                    LinkedinApi.authorize();
+                } else {
+                    //not authorized or logged in
+                    FacebookApi.login({scope:'user_location,friends_location'});
+                }
+            },
+            login: function (scope) {
+                FB.login(this.loginCallback, scope);
+            },
+            loginCallback: function (response) {
+                if (response.authResponse) {
+                    //authorizeLinkedin();
+                    LinkedinApi.authorize();
+                } else {
+                    //handle error
+                }
+            },
+            getFriends: function () {
+                FB.api('/me/?fields=friends.fields(name,location,gender,education,work)', this.getFriendsCallback);
+            },
+            getFriendsCallback: function (response) {
+                //@todo response handling
+
+                FacebookApi.setFriendsResponse(response);
+                LinkedinApi.getConnections();
+            },
+            setFriendsResponse: function (response) {
+                this.friendsResponse = response;
+            },
+            getFriendsResponse: function () {
+                return this.friendsResponse;
+            },
+            parseFriends: function () {
+                var friends = [];
+                for (var key in this.friendsResponse.friends.data) {
+                    var item = this.friendsResponse.friends.data[key];
+                    friends.push(
+                        {
+                            name:    (typeof item.name !== 'undefined') ? item.name : 'undefined',
+                            gender:  (typeof item.gender !== 'undefined') ? item.gender : 'undefined',
+                            location:(typeof item.location !== 'undefined') ? item.location.name : 'undefined',
+                            size: Math.random(0, 50)
+                        }
+                    );
+                }
+
+                return friends;
+            }
+        };
+
+        LinkedinApi = {
+            connectionsResponse: {},
+            authorize: function () {
+                IN.User.authorize(this.authorizeCallback);
+            },
+            authorizeCallback: function (response) {
+                //@todo response handling
+
+                //fbGetFriends();
+                FacebookApi.getFriends();
+            },
+            getConnections: function () {
+                IN.API.Connections('me')
+                        .fields('formatted-name', 'location', 'educations', 'positions')
+                        .result(this.getConnectionsCallback);
+            },
+            getConnectionsCallback: function (response) {
+                LinkedinApi.setConnectionsResponse(response);
+                View.render(FacebookApi.getFriendsResponse(), LinkedinApi.getConnectionsResponse());
+            },
+            setConnectionsResponse: function (response) {
+                this.connectionsResponse = response;
+            },
+            getConnectionsResponse: function () {
+                return this.connectionsResponse;
+            },
+            parseConnections: function () {
+                var connections = [];
+                for (var key in this.connectionsResponse.values) {
+                    var item = this.connectionsResponse.values[key];
+                    connections.push(
+                        {
+                            name:    (typeof item.formattedName !== 'undefined') ? item.formattedName : 'undefined',
+                            location:(typeof item.location !== 'undefined') ? item.location.name : 'undefined',
+                            size: Math.random(0, 50)
+                        }
+                    );
+                }
+
+                return connections;
+            }
+        };
+
+        View = {
+            render: function () {
+                var friends = FacebookApi.parseFriends();
+                var connections = LinkedinApi.parseConnections();
+                var json = this.createJson(friends, connections);
+
+                D3.createMarkup(json);
+            },
+            createJson: function (friends, connections) {
+                return {
+                    "name": "flare",
+                    "children": [
+                        {
+                            "name": "facebook",
+                            "children": friends
+                        },
+                        {
+                            'name': 'linkedin',
+                            'children': connections
+                        }
+                    ]
+                };
+            }
+        };
+
+        var D3 = {
+            createMarkup: function (json) {
+                var r = 960,
+                        format = d3.format(",d"),
+                        fill = d3.scale.category20c();
+
+                var bubble = d3.layout.pack()
+                        .sort(null)
+                        .size([r, r])
+                        .padding(1.5);
+
+                var vis = d3.select("#chart").append("svg")
+                        .attr("width", r)
+                        .attr("height", r)
+                        .attr("class", "bubble");
+
+
+                var node = vis.selectAll("g.node")
+                        .data(bubble.nodes(this.classes(json))
+                        .filter(function(d) { return !d.children; }))
+                        .enter().append("g")
+                        .attr("class", "node")
+                        .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+                node.append("title")
+                        .text(function(d) { return d.className + ": " + format(d.value); });
+
+                node.append("circle")
+                        .attr("r", function(d) { return d.r; })
+                        .style("fill", function(d) { return fill(d.packageName); });
+
+                node.append("text")
+                        .attr("text-anchor", "middle")
+                        .attr("dy", ".3em")
+                        .text(function(d) { return d.className.substring(0, d.r / 3); });
+            },
+            classes: function (root) {
+                var classes = [];
+
+                function recurse(name, node) {
+                    if (node.children) node.children.forEach(function(child) { recurse(node.name, child); });
+                    else classes.push({packageName: name, className: node.name, value: node.size});
+                }
+
+                recurse(null, root);
+                return {children: classes};
+            }
+        };
+
+        FacebookApi.getLoginStatus();
+    };
+</script>
+<div id="chart"/>
+</body>
+</html>
