@@ -42,6 +42,15 @@ function loadData(){
 					if (err2) reject(err2);
 					else {
 						var masterList = mergeJson([res, res2]);
+						masterList.sort(function(a,b){
+						if (a.lastName < b.lastName) {return -1;}
+						else if (a.lastName > b.lastName) {return 1;}
+						else { 
+							if (a.firstName < b.firstName) {return -1;}
+							else if (a.firstName > b.firstName) {return 1;}
+							else { return 0;}
+						}
+						});
 						resolve(masterList);
 					}
 				});
@@ -116,13 +125,22 @@ function drawChart(mode){
 	var grpData = [];
 
 	var svg = d3.select("svg#chart");
-
 	if (mode == 'alpha'){
 		grpData[0] = {};
 		grpData[0].key = 'all';
 		grpData[0].values = data;
 		grpColumns = 1;
 		grpRows = 1;
+
+		grpData[0].values.sort(function(a,b){
+			if (a.lastName < b.lastName) {return -1;}
+			else if (a.lastName > b.lastName) {return 1;}
+			else { 
+				if (a.firstName < b.firstName) {return -1;}
+				else if (a.firstName > b.firstName) {return 1;}
+				else { return 0;}
+			}
+		});
 	}
 	else { // non alpha, more than one category
 		grpData = d3.nest()
