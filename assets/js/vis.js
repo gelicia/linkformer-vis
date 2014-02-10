@@ -128,7 +128,14 @@ function drawChart(mode){
 		.text(function(d){return d.key;});
 	}
 
-
+	for (var i = 0; i < grpData.length; i++) {
+		d3.selectAll("circle.info").filter(function(d, i2){
+			return mode=='alpha'? true : d[mode] == grpData[i].key;
+		}).attr({
+			cx: function(d,i2){return 30 * i; },//circleRad + ((i % columns) * ((svgSize.width-svgSize.margin)/columns));},
+			cy: function(d,i2){return 30 * i;}//circleRad + (Math.floor(i/columns) * ((svgSize.height-svgSize.margin)/columns));}		
+		}).transition(500).attr("opacity", 1);
+	}
 
 	/*d3.selectAll("circle.info").attr({
 		cx: function(d,i){return circleRad + ((i % columns) * ((svgSize.width-svgSize.margin)/columns));},
