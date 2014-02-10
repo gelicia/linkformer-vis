@@ -194,14 +194,14 @@ function drawChart(mode){
 		var width = svg.attr("width")/grpColumns;
 		var numAcrossFit = Math.floor((width - spacing) / ((circleRad*2) + spacing));
 		var sideMargin = grpData[i].values.length > numAcrossFit ? 
-			//this is missing something
-			((width-((numAcrossFit * ((circleRad*2) + spacing))))/2) + spacing
+			//this is not quite right
+			((width-((numAcrossFit * ((circleRad*2) + spacing))))/2) + (spacing * 2 )
 			: (width-((grpData[i].values.length * ((circleRad*2) + spacing))+spacing))/2;
 
 		d3.selectAll("circle.info").filter(function(d, i2){
 			return mode=='alpha'? true : d[mode] == grpData[i].key;
 		}).attr("opacity", 1)
-		.transition(1000).attr({
+		.transition().duration(1000).attr({
 			cx: function(d,i2){
 				return ((i%grpColumns)* width) + sideMargin + (Math.floor(i2%numAcrossFit) * ((circleRad*2) + spacing)); },
 			cy: function(d,i2){
