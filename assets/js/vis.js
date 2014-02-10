@@ -129,12 +129,18 @@ function drawChart(mode){
 	}
 
 	for (var i = 0; i < grpData.length; i++) {
+		var width = svg.attr("width")/grpColumns;
+		var numAcrossFit = Math.floor((width - spacing) / ((circleRad*2) + spacing));
+		var sideMargin = grpData[i].values.length > numAcrossFit ? (width-((numAcrossFit * ((circleRad*2) + spacing))+spacing))/2
+			: (width-((grpData[i].values.length * ((circleRad*2) + spacing))+spacing))/2;
+
 		d3.selectAll("circle.info").filter(function(d, i2){
 			return mode=='alpha'? true : d[mode] == grpData[i].key;
-		}).attr({
-			cx: function(d,i2){return 30 * i; },//circleRad + ((i % columns) * ((svgSize.width-svgSize.margin)/columns));},
-			cy: function(d,i2){return 30 * i;}//circleRad + (Math.floor(i/columns) * ((svgSize.height-svgSize.margin)/columns));}		
-		}).transition(500).attr("opacity", 1);
+		}).attr("opacity", 1)
+		.transition(1000).attr({
+			cx: function(d,i2){return (i * width) +(sideMargin + (i2 * ((circleRad*2) + spacing))); },//circleRad + ((i % columns) * ((svgSize.width-svgSize.margin)/columns));},
+			cy: function(d,i2){return circleRad + spacing;}//circleRad + (Math.floor(i/columns) * ((svgSize.height-svgSize.margin)/columns));}		
+		});
 	}
 
 	/*d3.selectAll("circle.info").attr({
