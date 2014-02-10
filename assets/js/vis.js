@@ -52,12 +52,14 @@ function toggleMode(mode){
 function drawChart(mode){
 	var grpColumns; 
 	var grpRows; 
-	var grpData;
+	var grpData = [];
 
 	var svg = d3.select("svg#chart");
 
 	if (mode == 'alpha'){
-		grpData = data;
+		grpData[0] = {};
+		grpData[0].key = 'all';
+		grpData[0].values = data;
 		grpColumns = 1;
 		grpRows = 1;
 	}
@@ -79,11 +81,11 @@ function drawChart(mode){
 	svg.selectAll("rect.category").remove();
    
    //set category boxes first, then put them in the right place;
-	var categories = svg.selectAll("rect.category").data(d3.range(grpData[0].values !== undefined ? grpData.length : 1))
+	var categories = svg.selectAll("rect.category").data(d3.range(grpData.length))
 	.enter().append('rect').attr({
 		width: (svg.attr("width")/grpColumns) - 2 ,
 		height: function(d,i){
-			var dataOfInterest = grpData[i].values !== undefined ? grpData[i].values : grpData;
+			var dataOfInterest = grpData[i].values;
 			var width = svg.attr("width")/grpColumns;
 			//mathmagical!
 			var numAcrossFit = Math.floor((width - spacing) / ((circleRad*2) + spacing));
@@ -96,6 +98,14 @@ function drawChart(mode){
 		id: function(d,i){return "cat_id"+i;}
 	}).classed("category",true);
 
+	/*
+		This is a best fix for a pretty tricky problem as far as I can figure.
+		I don't want to put them under previous boxes because I don't want to mess up
+		alphabetization, I did want to put them all at the max height of the row, but 
+		that requires knowing the height of the previous rows, so I just put them all at
+		whatever the tallest box was. This will look weird and should be fixed to something
+		else in the long run
+	*/
 	var maxHeight = d3.max(categories[0], function(d){return d.height.baseVal.value;});
 
 	categories.attr({
@@ -117,6 +127,8 @@ function drawChart(mode){
 		.classed('categoryLbl', true)
 		.text(function(d){return d.key;});
 	}
+
+
 
 	/*d3.selectAll("circle.info").attr({
 		cx: function(d,i){return circleRad + ((i % columns) * ((svgSize.width-svgSize.margin)/columns));},
