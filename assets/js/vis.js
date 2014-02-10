@@ -168,6 +168,7 @@ function drawChart(mode){
 		else in the long run
 	*/
 	var maxHeight = d3.max(categories[0], function(d){return d.height.baseVal.value;});
+	svg.attr("height", maxHeight * grpRows);
 
 	categories.attr({
 		x: function(d,i){return ((i % grpColumns) * (this.width.baseVal.value));},
@@ -192,7 +193,9 @@ function drawChart(mode){
 	for (var i = 0; i < grpData.length; i++) {
 		var width = svg.attr("width")/grpColumns;
 		var numAcrossFit = Math.floor((width - spacing) / ((circleRad*2) + spacing));
-		var sideMargin = grpData[i].values.length > numAcrossFit ? (width-((numAcrossFit * ((circleRad*2) + spacing))+spacing))/2
+		var sideMargin = grpData[i].values.length > numAcrossFit ? 
+			//this is missing something
+			((width-((numAcrossFit * ((circleRad*2) + spacing))))/2) + spacing
 			: (width-((grpData[i].values.length * ((circleRad*2) + spacing))+spacing))/2;
 
 		d3.selectAll("circle.info").filter(function(d, i2){
@@ -200,10 +203,10 @@ function drawChart(mode){
 		}).attr("opacity", 1)
 		.transition(1000).attr({
 			cx: function(d,i2){
-				return ((i%grpColumns)* width) +(sideMargin + (i2 * ((circleRad*2) + spacing))); },
+				return ((i%grpColumns)* width) + sideMargin + (Math.floor(i2%numAcrossFit) * ((circleRad*2) + spacing)); },
 			cy: function(d,i2){
-				return (circleRad + spacing) + ((Math.floor(i/grpColumns)) * (maxHeight));
+				return (circleRad + spacing) + ((Math.floor(i/grpColumns)) * (maxHeight)) + ((Math.floor(i2/numAcrossFit)) * ((circleRad*2) + spacing));
 			}
-		});
+		}); 
 	}
 }
