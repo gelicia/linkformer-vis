@@ -138,15 +138,13 @@ function drawChart(mode){
 			return mode=='alpha'? true : d[mode] == grpData[i].key;
 		}).attr("opacity", 1)
 		.transition(1000).attr({
-			cx: function(d,i2){return (i * width) +(sideMargin + (i2 * ((circleRad*2) + spacing))); },//circleRad + ((i % columns) * ((svgSize.width-svgSize.margin)/columns));},
-			cy: function(d,i2){return circleRad + spacing;}//circleRad + (Math.floor(i/columns) * ((svgSize.height-svgSize.margin)/columns));}		
+			cx: function(d,i2){
+				return ((i%grpColumns)* width) +(sideMargin + (i2 * ((circleRad*2) + spacing))); },
+			cy: function(d,i2){
+				//this isnt right, it's not going to handle several rows, but that doesn't
+				//match the data I have right now, I need to open up the proverbial floodgates
+				return (circleRad + spacing) + ((Math.floor(i/grpColumns)) * (maxHeight));
+			}
 		});
 	}
-
-	/*d3.selectAll("circle.info").attr({
-		cx: function(d,i){return circleRad + ((i % columns) * ((svgSize.width-svgSize.margin)/columns));},
-		cy: function(d,i){return circleRad + (Math.floor(i/columns) * ((svgSize.height-svgSize.margin)/columns));}		
-	}).transition(500).attr("opacity", 1);*/
-
-
 }
