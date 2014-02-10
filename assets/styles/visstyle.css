@@ -1,0 +1,11 @@
+svg#chart{
+	display: block;
+	margin: auto;
+	margin-top: 10px;
+}
+
+.categoryLbl {
+ font-size: 13px;
+ fill: #727272;
+  alignment-baseline: text-before-edge;
+}
