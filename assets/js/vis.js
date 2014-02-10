@@ -35,12 +35,73 @@ function loadData(){
 	//we're going to need to handle the several-step process to get data in from the two
 	//apis, then merge it together (See listMerge.js, and then go onto displaying it)
 	var promise = new Promise(function (resolve, reject) {
-		d3.json('all.json', function (err, res) {
+		d3.json('fbreal.json', function (err, res) {
 			if (err) reject(err);
-			else {resolve(res); } 
+			else {//resolve(res); 
+				d3.json('lireal.json', function (err2, res2) {
+					if (err2) reject(err2);
+					else {
+						var masterList = mergeJson([res, res2]);
+						resolve(masterList);
+					}
+				});
+			} 
 		});
 	}); 
 	return promise;
+}
+
+function mergeJson(jsonData){
+	var masterList = [];
+	var data1 = jsonData[0];//facebook data stream
+	var data2 = jsonData[1];//linkedin data stream
+
+
+	data1.friends.data.map(
+	function(d){
+		var obj = {};
+		obj.firstName = d.first_name;
+		obj.lastName = d.last_name;
+		obj.location = d.current_location!==undefined? d.current_location.name : d.location !== undefined ? d.location.name : 'None';
+		obj.network = 'facebook';
+
+		if(d.work !== undefined && d.work.length > 0){
+			obj.work = [];
+			d.work.map(function(dw){
+				obj.work.push(dw.employer.name);
+			});
+		} 
+
+		if(d.education!==undefined && d.education.length > 0){
+			obj.school = [];
+			d.education.map(function(dw){
+				obj.school.push(dw.school.name);
+			});
+		}  
+
+		masterList.push(obj);
+	});
+ 
+	data2.people.values.map(
+	function(d){
+		var obj = {};
+		obj.firstName = d.firstName;
+		obj.lastName = d.lastName;
+		obj.location = d.location !== undefined? d.location.name : 'None';
+		obj.distance = d.distance;
+		obj.network = 'linkedin';
+
+		if(d.positions !== undefined && d.positions.values.length > 0){
+			obj.work = [];
+			d.positions.values.map(function(dw){
+				obj.work.push(dw.company.name);
+			});
+		}   
+
+		masterList.push(obj);
+	});
+
+	return masterList;
 }
 
 function toggleMode(mode){
@@ -141,8 +202,6 @@ function drawChart(mode){
 			cx: function(d,i2){
 				return ((i%grpColumns)* width) +(sideMargin + (i2 * ((circleRad*2) + spacing))); },
 			cy: function(d,i2){
-				//this isnt right, it's not going to handle several rows, but that doesn't
-				//match the data I have right now, I need to open up the proverbial floodgates
 				return (circleRad + spacing) + ((Math.floor(i/grpColumns)) * (maxHeight));
 			}
 		});
