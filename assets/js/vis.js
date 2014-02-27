@@ -1,6 +1,5 @@
 //globals
 var data;
-//var svgSize = {width:494, height:269, margin: 89};
 var circleRad = 10;
 var spacing = 3;
 
@@ -111,6 +110,7 @@ function toggleMode(mode){
 //alpha, location, network, company
 //location and network are used directly with the nest, wont work if changed
 function drawChart(mode){
+	var svgHeight;
 	var grpColumns;
 	var grpRows;
 	var grpData = [];
@@ -165,7 +165,12 @@ function drawChart(mode){
 		else in the long run
 	*/
 	var maxHeight = d3.max(categories[0], function(d){return d.height.baseVal.value;});
-	svg.attr("height", maxHeight * grpRows);
+	
+	svgHeight = maxHeight * grpRows;
+	//if the svg is growing, grow now so you see everything as it expands
+	if (svg.attr("height") < svgHeight){
+		svg.attr("height", svgHeight);
+	}
 
 	categories.attr({
 		x: function(d,i){return ((i % grpColumns) * (this.width.baseVal.value));},
@@ -187,25 +192,33 @@ function drawChart(mode){
 		.text(function(d){return d.key;});
 	}
 
-	for (var i = 0; i < grpData.length; i++) {
-		var width = svg.attr("width")/grpColumns;
-		var numAcrossFit = Math.floor((width - spacing) / ((circleRad*2) + spacing));
-		var sideMargin = grpData[i].values.length > numAcrossFit ?
-			//this is not quite right
-			((width-((numAcrossFit * ((circleRad*2) + spacing))))/2) + (spacing * 2 )
-			: (width-((grpData[i].values.length * ((circleRad*2) + spacing))+spacing))/2;
+	new Promise(function (resolve){
+		for (var i = 0; i < grpData.length; i++) {
+			var width = svg.attr("width")/grpColumns;
+			var numAcrossFit = Math.floor((width - spacing) / ((circleRad*2) + spacing));
+			var sideMargin = grpData[i].values.length > numAcrossFit ?
+				//this is not quite right
+				((width-((numAcrossFit * ((circleRad*2) + spacing))))/2) + (spacing * 2 )
+				: (width-((grpData[i].values.length * ((circleRad*2) + spacing))+spacing))/2;
 
-		d3.selectAll("circle.info").filter(function(d, i2){
-			return mode=='alpha'? true : d[mode] == grpData[i].key;
-		}).attr("opacity", 1)
-		.transition().duration(1000).attr({
-			cx: function(d,i2){
-				return ((i%grpColumns)* width) + sideMargin + (Math.floor(i2%numAcrossFit) * ((circleRad*2) + spacing)); },
-			cy: function(d,i2){
-				return (circleRad + spacing) + ((Math.floor(i/grpColumns)) * (maxHeight)) + ((Math.floor(i2/numAcrossFit)) * ((circleRad*2) + spacing));
-			}
-		});
-	}
+			d3.selectAll("circle.info").filter(function(d, i2){
+				return mode=='alpha'? true : d[mode] == grpData[i].key;
+			}).attr("opacity", 1)
+			.transition().duration(1000).attr({
+				cx: function(d,i2){
+					return ((i%grpColumns)* width) + sideMargin + (Math.floor(i2%numAcrossFit) * ((circleRad*2) + spacing)); },
+				cy: function(d,i2){
+					return (circleRad + spacing) + ((Math.floor(i/grpColumns)) * (maxHeight)) + ((Math.floor(i2/numAcrossFit)) * ((circleRad*2) + spacing));
+				}
+			}).each("end", function(){resolve();});
+
+		}
+	}).then(function(){
+		//if the svg shrunk, we didn't resize it before so you could see the objects moving 
+		//without being outside the new svg. shrink the svg now
+		svg.attr("height", svgHeight);
+	});
+
 }
 
 function sortData(dataIn, mode){
