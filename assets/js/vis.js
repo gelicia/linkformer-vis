@@ -7,7 +7,7 @@ var spacing = 3;
 function loadPage(){
 	loadData().then(
 		function(onFuf, onRej){
-			data = onFuf;
+			data = sortData(onFuf, 'alpha');
 			//initial graphic draw
 			var colorScale = d3.scale.linear().range(['#8FD68C', '#DDBE6F']).domain([0,data.length]);
 
@@ -37,26 +37,17 @@ function loadData(){
 	var promise = new Promise(function (resolve, reject) {
 		d3.json('fbreal.json', function (err, res) {
 			if (err) reject(err);
-			else {//resolve(res); 
+			else {
 				d3.json('lireal.json', function (err2, res2) {
 					if (err2) reject(err2);
 					else {
 						var masterList = mergeJson([res, res2]);
-						masterList.sort(function(a,b){
-						if (a.lastName < b.lastName) {return -1;}
-						else if (a.lastName > b.lastName) {return 1;}
-						else { 
-							if (a.firstName < b.firstName) {return -1;}
-							else if (a.firstName > b.firstName) {return 1;}
-							else { return 0;}
-						}
-						});
 						resolve(masterList);
 					}
 				});
-			} 
+			}
 		});
-	}); 
+	});
 	return promise;
 }
 
@@ -66,7 +57,7 @@ function mergeJson(jsonData){
 	var data2 = jsonData[1];//linkedin data stream
 
 
-	data1.friends.data.map(
+	data1.data.map(
 	function(d){
 		var obj = {};
 		obj.firstName = d.first_name;
@@ -79,18 +70,18 @@ function mergeJson(jsonData){
 			d.work.map(function(dw){
 				obj.work.push(dw.employer.name);
 			});
-		} 
+		}
 
 		if(d.education!==undefined && d.education.length > 0){
 			obj.school = [];
 			d.education.map(function(dw){
 				obj.school.push(dw.school.name);
 			});
-		}  
+		}
 
 		masterList.push(obj);
 	});
- 
+
 	data2.people.values.map(
 	function(d){
 		var obj = {};
@@ -100,12 +91,12 @@ function mergeJson(jsonData){
 		obj.distance = d.distance;
 		obj.network = 'linkedin';
 
-		if(d.positions !== undefined && d.positions.values.length > 0){
+		if(d.positions !== undefined && d.positions.values !== undefined && d.positions.values.length > 0){
 			obj.work = [];
 			d.positions.values.map(function(dw){
 				obj.work.push(dw.company.name);
 			});
-		}   
+		}
 
 		masterList.push(obj);
 	});
@@ -120,8 +111,8 @@ function toggleMode(mode){
 //alpha, location, network, company
 //location and network are used directly with the nest, wont work if changed
 function drawChart(mode){
-	var grpColumns; 
-	var grpRows; 
+	var grpColumns;
+	var grpRows;
 	var grpData = [];
 
 	var svg = d3.select("svg#chart");
@@ -132,33 +123,21 @@ function drawChart(mode){
 		grpColumns = 1;
 		grpRows = 1;
 
-		grpData[0].values.sort(function(a,b){
-			if (a.lastName < b.lastName) {return -1;}
-			else if (a.lastName > b.lastName) {return 1;}
-			else { 
-				if (a.firstName < b.firstName) {return -1;}
-				else if (a.firstName > b.firstName) {return 1;}
-				else { return 0;}
-			}
-		});
+		grpData[0].values = sortData(grpData[0].values, mode);
 	}
 	else { // non alpha, more than one category
 		grpData = d3.nest()
 		.key(function(d) { return d[mode]; })
 		.entries(data);
 
-		grpData.sort(function(a,b){
-			if (a.key < b.key) {return -1;}
-			else if (a.key > b.key) {return 1;}
-			else { return 0;}
-		});
+		grpData = sortData(grpData, mode);
 
 		grpColumns = grpData.length < 3 ? grpData.length : 3;
-		grpRows = Math.ceil(grpData.length / grpColumns);		
+		grpRows = Math.ceil(grpData.length / grpColumns);
 	}
 
 	svg.selectAll("rect.category").remove();
-   
+
    //set category boxes first, then put them in the right place;
 	var categories = svg.selectAll("rect.category").data(d3.range(grpData.length))
 	.enter().append('rect').attr({
@@ -180,7 +159,7 @@ function drawChart(mode){
 	/*
 		This is a best fix for a pretty tricky problem as far as I can figure.
 		I don't want to put them under previous boxes because I don't want to mess up
-		alphabetization, I did want to put them all at the max height of the row, but 
+		alphabetization, I did want to put them all at the max height of the row, but
 		that requires knowing the height of the previous rows, so I just put them all at
 		whatever the tallest box was. This will look weird and should be fixed to something
 		else in the long run
@@ -211,7 +190,7 @@ function drawChart(mode){
 	for (var i = 0; i < grpData.length; i++) {
 		var width = svg.attr("width")/grpColumns;
 		var numAcrossFit = Math.floor((width - spacing) / ((circleRad*2) + spacing));
-		var sideMargin = grpData[i].values.length > numAcrossFit ? 
+		var sideMargin = grpData[i].values.length > numAcrossFit ?
 			//this is not quite right
 			((width-((numAcrossFit * ((circleRad*2) + spacing))))/2) + (spacing * 2 )
 			: (width-((grpData[i].values.length * ((circleRad*2) + spacing))+spacing))/2;
@@ -225,6 +204,33 @@ function drawChart(mode){
 			cy: function(d,i2){
 				return (circleRad + spacing) + ((Math.floor(i/grpColumns)) * (maxHeight)) + ((Math.floor(i2/numAcrossFit)) * ((circleRad*2) + spacing));
 			}
-		}); 
+		});
 	}
+}
+
+function sortData(dataIn, mode){
+	var outData;
+	if (mode == 'alpha'){
+		outData =dataIn.sort(function(a,b){
+			if (a.lastName < b.lastName) {return -1;}
+			else if (a.lastName > b.lastName) {return 1;}
+			else {
+				if (a.firstName < b.firstName) {return -1;}
+				else if (a.firstName > b.firstName) {return 1;}
+				else { return 0;}
+			}
+		});
+	}
+	else if (mode == 'location' || mode == 'network'){
+		outData = dataIn.sort(function(a,b){
+			if (a.key < b.key) {return -1;}
+			else if (a.key > b.key) {return 1;}
+			else { return 0;}
+		});
+	}
+	else if (mode == 'company'){
+
+	}
+
+	return outData;
 }
